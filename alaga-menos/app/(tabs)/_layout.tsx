@@ -1,45 +1,80 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+    return (
+        <Tabs
+            screenOptions={{
+                headerShown: false,
+                tabBarActiveTintColor: "#1c92ff",
+                tabBarInactiveTintColor: "#ffffff",
+                tabBarStyle: {
+                    backgroundColor: "black",
+                    borderTopColor: "#1c92ff",
+                },
+            }}
+        >
+            <Tabs.Screen
+                name="index"
+                options={{
+                    title: 'Inicio',
+                    tabBarIcon: ({ color }) => (
+                        <Ionicons size={28} name="home" color={color} />
+                    ),
+                }}
+            />
 
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
-  );
+             <Tabs.Screen
+                name="cadastro"
+                options={{
+                    title: 'Cadastro',
+                    tabBarIcon: ({ color }) => (
+                        <Ionicons size={28} name="people" color={color} />
+                    ),
+                }}
+            />
+
+            <Tabs.Screen
+                name="lista"
+                options={{
+                    title: 'Lista',
+                    tabBarIcon: ({ color }) => (
+                        <Ionicons size={28} name="list" color={color} />
+                    ),
+                }}
+            />
+
+            <Tabs.Screen
+                name="editar"
+                options={{
+                    title: 'Editar',
+                    tabBarIcon: ({ color }) => (
+                    <Feather name="edit" size={24} color={color} />
+                    ),
+                }}
+            />
+
+            <Tabs.Screen
+                name="vagas"
+                options={{
+                    title: 'Vagas',
+                    tabBarIcon: ({ color }) => (
+                        <Ionicons size={28} name="bicycle-outline" color={color} />
+                    ),
+                }}
+            />
+
+            <Tabs.Screen
+                name="integrantes"
+                options={{
+                    title: 'Devs',
+                    tabBarIcon: ({ color }) => (
+                        <Ionicons size={28} name="desktop" color={color} />
+                    ),
+                }}
+            />
+        </Tabs>
+    );
 }
