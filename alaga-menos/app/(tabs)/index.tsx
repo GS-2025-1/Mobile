@@ -22,13 +22,19 @@ export default function Home() {
 
       <ScrollView contentContainerStyle={styles.linksContainer}>
         <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/cadastro")}>
-          <Text style={styles.buttonText}>Cadastro</Text>
+          <Text style={styles.buttonText}>Cadastrar Endereço</Text>
         </TouchableOpacity>
       </ScrollView>
 
       <ScrollView contentContainerStyle={styles.linksContainer}>
         <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/enderecos")}>
           <Text style={styles.buttonText}>Endereços Salvos</Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      <ScrollView contentContainerStyle={styles.linksContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/mapa")}>
+          <Text style={styles.buttonText}>Mapa</Text>
         </TouchableOpacity>
       </ScrollView>
 
