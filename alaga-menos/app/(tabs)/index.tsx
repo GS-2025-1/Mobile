@@ -15,7 +15,7 @@ export default function Home() {
       <StatusBar style="light" />
 
       <Image
-        source={require('../../assets/images/gu.png')}
+        source={require('../../assets/images/alagamenos.png')}
         style={styles.logo}
         resizeMode="contain"
       />

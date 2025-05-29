@@ -107,6 +107,18 @@ export default function EnderecosCadastrados() {
                   onPress={() => editarEndereco(endereco)}
                 >
                   <Text style={styles.textoBotao}>Editar</Text>
+                <TouchableOpacity
+                  style={{ backgroundColor: '#2196F3', padding: 8, borderRadius: 6, marginTop: 8 }}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/mapa',
+                      params: { cep: endereco.cep }
+                    })
+                  }
+                >
+                  <Text style={{ color: '#fff', textAlign: 'center' }}>Ver no mapa</Text>
+                </TouchableOpacity>
+
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.botaoExcluir}
