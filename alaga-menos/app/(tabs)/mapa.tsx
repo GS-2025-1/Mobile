@@ -2,68 +2,59 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-
-type Coordenadas = {
-  latitude: number;
-  longitude: number;
-};
+import * as Location from 'expo-location';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyD8Zv-YC0LgO1RcikKzybw7ihKKW9-Hj5g';
 
 const mapDarkStyle = [
-  {
-    elementType: 'geometry',
-    stylers: [{ color: '#1d2c4d' }],
-  },
-  {
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#ffffff' }],
-  },
-  {
-    elementType: 'labels.text.stroke',
-    stylers: [{ color: '#1a3646' }],
-  },
-  {
-    featureType: 'road',
-    elementType: 'geometry',
-    stylers: [{ color: '#304a7d' }],
-  },
-  {
-    featureType: 'poi',
-    stylers: [{ visibility: 'off' }],
-  },
+  { elementType: 'geometry', stylers: [{ color: '#1d2c4d' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#ffffff' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#1a3646' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#304a7d' }] },
+  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
 ];
 
 const mapLightStyle: any[] = [];
 
+const alagamentosFicticios = [
+  { lat: -23.55052, lng: -46.633308, nome: 'Centro de SP' },
+  { lat: -23.513377, lng: -46.670744, nome: 'Av. Eng. Caetano Álvares (Limão)' },
+  { lat: -23.588862, lng: -46.544521, nome: 'Av. Anhaia Mello (estação São Lucas) ' },
+  { lat: -23.593564, lng: -46.590481, nome: 'Av. Presidente Wilson (Estação Tamanduateí)' },
+  { lat: -23.507059, lng: -46.747651, nome: 'Jardim Santo Elias (Avenida 1)' },
+  { lat: -23.525682, lng: -46.681808, nome: 'Av. Pompéia (Shopping Bourbon)' }
+];
+
 export default function LocalizacaoMapa() {
   const { cep } = useLocalSearchParams();
   const router = useRouter();
-  const [coordenadas, setCoordenadas] = useState<Coordenadas | null>(null);
+  const [coordenadas, setCoordenadas] = useState<{ latitude: number; longitude: number } | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [raio, setRaio] = useState(300);
   const [direcao, setDirecao] = useState(1);
   const [modoEscuro, setModoEscuro] = useState(true);
+  const [localAtual, setLocalAtual] = useState<{ latitude: number; longitude: number } | null>(null);
 
   useEffect(() => {
-    if (cep) {
-      buscarCoordenadasGoogleMaps(String(cep));
-    }
+    if (cep) buscarCoordenadasGoogleMaps(String(cep));
+    buscarLocalAtual();
   }, [cep]);
+
+  const buscarLocalAtual = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === 'granted') {
+      const location = await Location.getCurrentPositionAsync({});
+      setLocalAtual({ latitude: location.coords.latitude, longitude: location.coords.longitude });
+    }
+  };
 
   const buscarCoordenadasGoogleMaps = async (cep: string) => {
     try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${cep},Brasil&key=${GOOGLE_MAPS_API_KEY}`
-      );
+      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${cep},Brasil&key=${GOOGLE_MAPS_API_KEY}`);
       const data = await response.json();
-
       if (data.status === 'OK' && data.results.length > 0) {
         const location = data.results[0].geometry.location;
-        setCoordenadas({
-          latitude: location.lat,
-          longitude: location.lng,
-        });
+        setCoordenadas({ latitude: location.lat, longitude: location.lng });
       } else {
         console.warn('Resposta do Google:', data.status);
       }
@@ -77,12 +68,11 @@ export default function LocalizacaoMapa() {
   useEffect(() => {
     const intervalo = setInterval(() => {
       setRaio((prev) => {
-        if (prev >= 250) setDirecao(-1);
-        if (prev <= 150) setDirecao(1);
+        if (prev >= 350) setDirecao(-1);
+        if (prev <= 250) setDirecao(1);
         return prev + 6 * direcao;
       });
     }, 100);
-
     return () => clearInterval(intervalo);
   }, [direcao]);
 
@@ -110,8 +100,8 @@ export default function LocalizacaoMapa() {
         initialRegion={{
           latitude: coordenadas.latitude,
           longitude: coordenadas.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
         }}
         customMapStyle={modoEscuro ? mapDarkStyle : mapLightStyle}
         showsUserLocation
@@ -127,8 +117,27 @@ export default function LocalizacaoMapa() {
           radius={raio}
           strokeWidth={2}
           strokeColor="rgba(255,0,0,0.8)"
-          fillColor="rgba(16, 112, 255, 0.74)"
+          fillColor="rgba(16, 112, 255, 0.4)"
         />
+
+        {alagamentosFicticios.map((loc, index) => (
+          <>
+            <Marker
+              key={`alag-${index}`}
+              coordinate={{ latitude: loc.lat, longitude: loc.lng }}
+              title={loc.nome}
+              description="Área com histórico de alagamento"
+            />
+            <Circle
+              key={`circulo-${index}`}
+              center={{ latitude: loc.lat, longitude: loc.lng }}
+              radius={raio}
+              strokeWidth={2}
+              strokeColor="rgba(255,0,0,0.6)"
+              fillColor="rgba(255,0,0,0.3)"
+            />
+          </>
+        ))}
       </MapView>
 
       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -139,9 +148,7 @@ export default function LocalizacaoMapa() {
         onPress={() => setModoEscuro(!modoEscuro)}
         style={styles.toggleButton}
       >
-        <Text style={styles.toggleText}>
-          {modoEscuro ? '☀️' : '🌙'}
-        </Text>
+        <Text style={styles.toggleText}>{modoEscuro ? '☀️' : '🌙'}</Text>
       </TouchableOpacity>
 
       <View style={styles.card}>
@@ -153,12 +160,8 @@ export default function LocalizacaoMapa() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1,
-  },
+  container: { flex: 1 },
+  map: { flex: 1 },
   loading: {
     flex: 1,
     justifyContent: 'center',
