@@ -6,9 +6,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
 
-// Tipagem dos endereços
 type Endereco = {
   id: number;
+  nome: string;
   rua: string;
   numero: string;
   bairro: string;
@@ -93,6 +93,7 @@ export default function EnderecosCadastrados() {
         ) : (
           enderecos.map((endereco) => (
             <View key={endereco.id} style={styles.card}>
+              <Text style={styles.cardText}><Text style={styles.label}>Nome do endereço:</Text> {endereco.nome}</Text>
               <Text style={styles.cardText}><Text style={styles.label}>Rua:</Text> {endereco.rua}, {endereco.numero}</Text>
               <Text style={styles.cardText}><Text style={styles.label}>Bairro:</Text> {endereco.bairro}</Text>
               <Text style={styles.cardText}><Text style={styles.label}>Cidade:</Text> {endereco.cidade} - {endereco.estado}</Text>
@@ -146,10 +147,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    color: '#fff',
+    color: '#ffd600',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20
+    marginBottom: 20,
+    marginTop: 40,
   },
   card: {
     backgroundColor: '#ffffffcc',
@@ -181,7 +183,7 @@ const styles = StyleSheet.create({
   },
   botaoExcluir: {
     backgroundColor: '#dc3545',
-    padding: 10,
+    padding: 30,
     borderRadius: 6,
     flex: 1,
     marginLeft: 5,

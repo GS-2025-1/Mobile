@@ -43,7 +43,7 @@ export default function Dev({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "rgba(255,255,255,0.4)",
+    backgroundColor: "#ffffffcc",
     borderRadius: 16,
     padding: 24,
     alignItems: "center",
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   link: {
-    color: "#ffffff",
+    color: "#007bff",
     fontSize: 16,
     fontWeight: "500",
   },

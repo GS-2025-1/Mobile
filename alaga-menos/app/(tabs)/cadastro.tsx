@@ -7,6 +7,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 
 type Params = {
   id?: string | string[];
+  nome?: string | string[];
   rua?: string | string[];
   numero?: string | string[];
   bairro?: string | string[];
@@ -18,6 +19,7 @@ type Params = {
 };
 
 export default function CadastroEndereco() {
+  const [nome, setNome] = useState('');
   const [rua, setRua] = useState('');
   const [numero, setNumero] = useState('');
   const [bairro, setBairro] = useState('');
@@ -39,6 +41,7 @@ export default function CadastroEndereco() {
     if (getString(params.editando) === 'true' && params.id) {
       setEditando(true);
       setIdEdicao(Number(getString(params.id)));
+      setNome(getString(params.nome));
       setRua(getString(params.rua));
       setNumero(getString(params.numero));
       setBairro(getString(params.bairro));
@@ -50,7 +53,7 @@ export default function CadastroEndereco() {
   }, [params]);
 
   const salvarEndereco = async () => {
-    if (!rua || !numero || !bairro || !cidade || !estado || !cep) {
+    if (!nome || !rua || !numero || !bairro || !cidade || !estado || !cep) {
       Alert.alert('Erro', 'Preencha todos os campos obrigatórios.');
       return;
     }
@@ -62,13 +65,14 @@ export default function CadastroEndereco() {
       if (editando && idEdicao !== null) {
         enderecos = enderecos.map((e: any) =>
           e.id === idEdicao
-            ? { id: idEdicao, rua, numero, bairro, cidade, estado, cep, complemento }
+            ? { id: idEdicao, nome, rua, numero, bairro, cidade, estado, cep, complemento }
             : e
         );
         Alert.alert('Sucesso', 'Endereço atualizado com sucesso!');
       } else {
         const novo = {
           id: Date.now(),
+          nome,
           rua,
           numero,
           bairro,
@@ -83,7 +87,7 @@ export default function CadastroEndereco() {
 
       await AsyncStorage.setItem('enderecos', JSON.stringify(enderecos));
       limparCampos();
-      router.replace('/enderecos'); // volta e recarrega a listagem
+      router.replace('/enderecos');
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível salvar o endereço.');
       console.error(error);
@@ -91,6 +95,7 @@ export default function CadastroEndereco() {
   };
 
   const limparCampos = () => {
+    setNome('');
     setRua('');
     setNumero('');
     setBairro('');
@@ -113,6 +118,7 @@ export default function CadastroEndereco() {
             {editando ? 'Editar Endereço' : 'Cadastro de Endereço'}
           </Text>
 
+          <TextInput style={styles.input} placeholder="Nome do endereço" value={nome} onChangeText={setNome} />
           <TextInput style={styles.input} placeholder="Rua" value={rua} onChangeText={setRua} />
           <TextInput style={styles.input} placeholder="Número" keyboardType="numeric" value={numero} onChangeText={setNumero} />
           <TextInput style={styles.input} placeholder="Bairro" value={bairro} onChangeText={setBairro} />
@@ -144,7 +150,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    color: '#fff',
+    color: '#ffd600',
     fontWeight: 'bold',
     marginTop: 10,
     marginBottom: 10,

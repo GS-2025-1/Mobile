@@ -1,6 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
-import { Feather } from '@expo/vector-icons';
 
 
 export default function TabLayout() {
@@ -21,7 +20,7 @@ export default function TabLayout() {
                 options={{
                     title: 'Inicio',
                     tabBarIcon: ({ color }) => (
-                        <Ionicons size={28} name="home" color={color} />
+                        <Ionicons size={25} name="home" color={color} />
                     ),
                 }}
             />
@@ -31,7 +30,7 @@ export default function TabLayout() {
                 options={{
                     title: 'Cadastro',
                     tabBarIcon: ({ color }) => (
-                        <Ionicons size={28} name="people" color={color} />
+                        <Ionicons size={30} name="add" color={color} />
                     ),
                 }}
             />
@@ -51,7 +50,7 @@ export default function TabLayout() {
                 options={{
                     title: 'Mapa',
                     tabBarIcon: ({ color }) => (
-                        <Ionicons size={28} name="map" color={color} />
+                        <Ionicons size={25} name="map" color={color} />
                     ),
                 }}
             />
@@ -61,7 +60,17 @@ export default function TabLayout() {
                 options={{
                     title: 'Devs',
                     tabBarIcon: ({ color }) => (
-                        <Ionicons size={28} name="desktop" color={color} />
+                        <Ionicons size={25} name="desktop" color={color} />
+                    ),
+                }}
+            />
+
+            <Tabs.Screen
+                name="sobre"
+                options={{
+                    title: 'Sobre',
+                    tabBarIcon: ({ color }) => (
+                        <Ionicons size={27} name="information-circle" color={color} />
                     ),
                 }}
             />
