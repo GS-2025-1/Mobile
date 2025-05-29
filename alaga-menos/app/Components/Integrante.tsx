@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   link: {
-    color: "#5e17eb",
+    color: "#ffffff",
     fontSize: 16,
     fontWeight: "500",
   },

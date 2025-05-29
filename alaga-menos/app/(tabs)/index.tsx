@@ -1,17 +1,11 @@
 import { Stack, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { LinearGradient } from 'expo-linear-gradient';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function Home() {
   return (
-    <LinearGradient
-      colors={['#535353', '#1c92ff']}
-      start={{ x: 0, y: 1 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <Stack.Screen
         options={{
           headerShown: false,
@@ -26,16 +20,24 @@ export default function Home() {
         resizeMode="contain"
       />
 
-      
+      <ScrollView contentContainerStyle={styles.linksContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/cadastro")}>
+          <Text style={styles.buttonText}>Cadastro</Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      <ScrollView contentContainerStyle={styles.linksContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/enderecos")}>
+          <Text style={styles.buttonText}>Endereços Salvos</Text>
+        </TouchableOpacity>
+      </ScrollView>
+
       <ScrollView contentContainerStyle={styles.linksContainer}>
         <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/integrantes")}>
           <Text style={styles.buttonText}>Desenvolvedores</Text>
         </TouchableOpacity>
       </ScrollView>
-
-      
-
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -45,24 +47,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
+    backgroundColor: '#052e54',
   },
   linksContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     gap: 20,
-    color: "#5e17eb"
+    color: "#ffffff"
   },
   button: {
-    borderColor: '#ffffff',
-    backgroundColor: "#535353",
-    paddingVertical: 12,
-    
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    elevation: 5,
-    width: 200,
-    alignItems: 'center',
-    
+  borderColor: '#1c92ff',
+  borderWidth: 2,
+  backgroundColor: "#052e54",
+  paddingVertical: 12,
+  paddingHorizontal: 24,
+  borderRadius: 8,
+  elevation: 5,
+  width: 200,
+  alignItems: 'center',
   },
   logo: {
     width: 380,

@@ -37,31 +37,11 @@ export default function TabLayout() {
             />
 
             <Tabs.Screen
-                name="lista"
+                name="enderecos"
                 options={{
-                    title: 'Lista',
+                    title: 'Endereços',
                     tabBarIcon: ({ color }) => (
                         <Ionicons size={28} name="list" color={color} />
-                    ),
-                }}
-            />
-
-            <Tabs.Screen
-                name="editar"
-                options={{
-                    title: 'Editar',
-                    tabBarIcon: ({ color }) => (
-                    <Feather name="edit" size={24} color={color} />
-                    ),
-                }}
-            />
-
-            <Tabs.Screen
-                name="vagas"
-                options={{
-                    title: 'Vagas',
-                    tabBarIcon: ({ color }) => (
-                        <Ionicons size={28} name="bicycle-outline" color={color} />
                     ),
                 }}
             />

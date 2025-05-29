@@ -1,19 +1,12 @@
 import { Stack } from "expo-router";
 import React from "react";
-import { ScrollView, StyleSheet, Text } from "react-native";
-import { LinearGradient } from 'expo-linear-gradient';
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Integrante from "../Components/Integrante";
-import { BlurView } from 'expo-blur';
 
 export default function DevsPage() {
   return (
-    <LinearGradient
-      colors={['#ff5f96', '#ffe66d']}
-      start={{ x: 0, y: 1 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.gradient}
-    >
-      <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <Stack.Screen
           options={{
             title: "Devs",
@@ -39,38 +32,34 @@ export default function DevsPage() {
           linkedinUrl="https://www.linkedin.com/in/julio-cesar-rodrigues29/"
         />
 
-        
-
         <Integrante
           nome="Matheus de Freitas Silva"
           rm="552602"
           sala="2TDSPF"
-          imgSrc={require("../../assets/images/julio.png")}
+          imgSrc={require("../../assets/images/matheus.png")}
           githubUrl="https://github.com/MatheusFreitasSilva"
           linkedinUrl="https://www.linkedin.com/in/matheus-freitas-9110a51b2/"
         />
       </ScrollView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
   container: {
+    flex: 1,
+    backgroundColor: '#052e54',
+  },
+  scrollContent: {
     padding: 16,
     paddingBottom: 40,
   },
   title: {
     fontSize: 23,
-    color: "#333",
+    color: "#ffffff",
     fontWeight: "bold",
     alignSelf: "center",
     marginBottom: 24,
     marginTop: 40,
-  },
-  githubUrl: {
-    color: "#5e17eb",
   },
 });
