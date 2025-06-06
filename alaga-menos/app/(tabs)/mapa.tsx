@@ -26,7 +26,7 @@ const alagamentosFicticios = [
 ];
 
 export default function LocalizacaoMapa() {
-  const { cep } = useLocalSearchParams();
+  const { nome_rua, bairro, cidade, estado } = useLocalSearchParams();
   const router = useRouter();
   const [coordenadas, setCoordenadas] = useState<{ latitude: number; longitude: number } | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -36,9 +36,11 @@ export default function LocalizacaoMapa() {
   const [localAtual, setLocalAtual] = useState<{ latitude: number; longitude: number } | null>(null);
 
   useEffect(() => {
-    if (cep) buscarCoordenadasGoogleMaps(String(cep));
+    if (nome_rua && bairro && cidade && estado) {
+      buscarCoordenadasGoogleMaps(nome_rua as string, bairro as string, cidade as string, estado as string);
+    }
     buscarLocalAtual();
-  }, [cep]);
+  }, [nome_rua, bairro, cidade, estado]);
 
   const buscarLocalAtual = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -48,9 +50,16 @@ export default function LocalizacaoMapa() {
     }
   };
 
-  const buscarCoordenadasGoogleMaps = async (cep: string) => {
+  const buscarCoordenadasGoogleMaps = async (
+    nome_rua: string,
+    bairro: string,
+    cidade: string,
+    estado: string
+  ) => {
     try {
-      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${cep},Brasil&key=${GOOGLE_MAPS_API_KEY}`);
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${nome_rua},${bairro},${cidade},${estado},Brasil&key=${GOOGLE_MAPS_API_KEY}`
+      );
       const data = await response.json();
       if (data.status === 'OK' && data.results.length > 0) {
         const location = data.results[0].geometry.location;
@@ -88,7 +97,7 @@ export default function LocalizacaoMapa() {
   if (!coordenadas) {
     return (
       <View style={styles.loading}>
-        <Text>Não foi possível exibir a localização para o CEP informado.</Text>
+        <Text>Não foi possível exibir a localização para o endereço informado.</Text>
       </View>
     );
   }
@@ -108,16 +117,8 @@ export default function LocalizacaoMapa() {
       >
         <Marker
           coordinate={coordenadas}
-          title="Local informado"
-          description={`CEP: ${cep}`}
-        />
-
-        <Circle
-          center={coordenadas}
-          radius={raio}
-          strokeWidth={2}
-          strokeColor="rgba(255,0,0,0.8)"
-          fillColor="rgba(16, 112, 255, 0.4)"
+          title="Endereço informado"
+          description={`${nome_rua}, ${bairro}, ${cidade} - ${estado}`}
         />
 
         {alagamentosFicticios.map((loc, index) => (
@@ -133,8 +134,8 @@ export default function LocalizacaoMapa() {
               center={{ latitude: loc.lat, longitude: loc.lng }}
               radius={raio}
               strokeWidth={2}
-              strokeColor="rgba(255,0,0,0.6)"
-              fillColor="rgba(255,0,0,0.3)"
+              strokeColor="rgba(0, 174, 255, 0.6)"
+              fillColor="rgba(4, 0, 255, 0.57)"
             />
           </>
         ))}
@@ -152,12 +153,13 @@ export default function LocalizacaoMapa() {
       </TouchableOpacity>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>CEP informado:</Text>
-        <Text style={styles.cardCep}>{cep}</Text>
+        <Text style={styles.cardTitle}>As áreas em azul estão alagadas. Endereço informado:</Text>
+        <Text style={styles.cardCep}>{nome_rua}, {bairro}, {cidade} - {estado}</Text>
       </View>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
