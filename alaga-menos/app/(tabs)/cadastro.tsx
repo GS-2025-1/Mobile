@@ -1,67 +1,51 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { postEndereco, putEndereco } from '@/services/enderecos';
-
-type Params = {
-  id?: string | string[];
-  nome_rua?: string | string[];
-  bairro?: string | string[];
-  cidade?: string | string[];
-  estado?: string | string[];
-  editando?: string | string[];
-};
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import { postRua } from '@/services/ruas';
 
 export default function CadastroEndereco() {
   const [nomeRua, setNomeRua] = useState('');
   const [bairro, setBairro] = useState('');
   const [cidade, setCidade] = useState('');
   const [estado, setEstado] = useState('');
+  const [cep, setCep] = useState('');
 
-  const [editando, setEditando] = useState(false);
-  const [idEdicao, setIdEdicao] = useState<number | null>(null);
-
-  const params = useLocalSearchParams<Params>();
   const router = useRouter();
 
-  useEffect(() => {
-    const getString = (val: string | string[] | undefined): string =>
-      Array.isArray(val) ? val[0] : val || '';
-
-    if (getString(params.editando) === 'true' && params.id) {
-      setEditando(true);
-      setIdEdicao(Number(getString(params.id)));
-      setNomeRua(getString(params.nome_rua));
-      setBairro(getString(params.bairro));
-      setCidade(getString(params.cidade));
-      setEstado(getString(params.estado));
-    }
-  }, [params]);
-
   const salvarEndereco = async () => {
-    if (!nomeRua || !bairro || !cidade || !estado) {
-      Alert.alert('Erro', 'Preencha todos os campos obrigatórios.');
+    if (!nomeRua || !bairro || !cidade || !estado || !cep) {
+      Alert.alert('Erro', 'Preencha todos os campos.');
       return;
     }
 
-    const endereco = {
-      nome_rua: nomeRua,
-      bairro,
-      cidade,
-      estado
-    };
-
     try {
-      if (editando && idEdicao !== null) {
-        await putEndereco(idEdicao, endereco);
-        Alert.alert('Sucesso', 'Endereço atualizado com sucesso!');
-      } else {
-        await postEndereco(endereco);
-        Alert.alert('Sucesso', 'Endereço cadastrado com sucesso!');
-      }
+      // 1️⃣ Posta a rua na API
+      await postRua({
+        nomeRua,
+        observacao: '',
+        bairroId: 1 // valor fixo para testes (se selecionar 1 = Moema, 2 = Itaim Bibi, e 3 = Vila Mariana...)
+      });
 
+      // 2️⃣ Salva os dados extras no AsyncStorage
+      const dados = await AsyncStorage.getItem('enderecos');
+      let enderecos = dados ? JSON.parse(dados) : [];
+
+      const novo = {
+        id: Date.now(),
+        nomeRua,
+        bairro,
+        cidade,
+        estado,
+        cep
+      };
+
+      enderecos.push(novo);
+      await AsyncStorage.setItem('enderecos', JSON.stringify(enderecos));
+
+      Alert.alert('Sucesso', 'Endereço cadastrado com sucesso!');
       limparCampos();
       router.replace('/enderecos');
     } catch (error) {
@@ -75,8 +59,7 @@ export default function CadastroEndereco() {
     setBairro('');
     setCidade('');
     setEstado('');
-    setEditando(false);
-    setIdEdicao(null);
+    setCep('');
   };
 
   return (
@@ -86,37 +69,16 @@ export default function CadastroEndereco() {
         style={{ flex: 1 }}
       >
         <ScrollView style={styles.container}>
-          <Text style={styles.title}>
-            {editando ? 'Editar Endereço' : 'Cadastro de Endereço'}
-          </Text>
+          <Text style={styles.title}>Cadastro de Endereço</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Rua"
-            value={nomeRua}
-            onChangeText={setNomeRua}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Bairro"
-            value={bairro}
-            onChangeText={setBairro}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Cidade"
-            value={cidade}
-            onChangeText={setCidade}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Estado"
-            value={estado}
-            onChangeText={setEstado}
-          />
+          <TextInput style={styles.input} placeholder="Nome da rua" value={nomeRua} onChangeText={setNomeRua} />
+          <TextInput style={styles.input} placeholder="Bairro" value={bairro} onChangeText={setBairro} />
+          <TextInput style={styles.input} placeholder="Cidade" value={cidade} onChangeText={setCidade} />
+          <TextInput style={styles.input} placeholder="Estado" value={estado} onChangeText={setEstado} />
+          <TextInput style={styles.input} placeholder="CEP" keyboardType="numeric" value={cep} onChangeText={setCep} />
 
           <Button
-            title={editando ? 'Atualizar Endereço' : 'Salvar Endereço'}
+            title="Salvar Endereço"
             onPress={salvarEndereco}
             color="#28a745"
           />

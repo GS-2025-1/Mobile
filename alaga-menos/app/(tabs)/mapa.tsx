@@ -4,7 +4,7 @@ import MapView, { Marker, Circle } from 'react-native-maps';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 
-const GOOGLE_MAPS_API_KEY = '';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyD8Zv-YC0LgO1RcikKzybw7ihKKW9-Hj5g';
 
 const mapDarkStyle = [
   { elementType: 'geometry', stylers: [{ color: '#1d2c4d' }] },
@@ -121,24 +121,25 @@ export default function LocalizacaoMapa() {
           description={`${nome_rua}, ${bairro}, ${cidade} - ${estado}`}
         />
 
-        {alagamentosFicticios.map((loc, index) => (
-          <>
-            <Marker
-              key={`alag-${index}`}
-              coordinate={{ latitude: loc.lat, longitude: loc.lng }}
-              title={loc.nome}
-              description="Área com histórico de alagamento"
-            />
-            <Circle
-              key={`circulo-${index}`}
-              center={{ latitude: loc.lat, longitude: loc.lng }}
-              radius={raio}
-              strokeWidth={2}
-              strokeColor="rgba(0, 174, 255, 0.6)"
-              fillColor="rgba(4, 0, 255, 0.57)"
-            />
-          </>
-        ))}
+    {alagamentosFicticios.map((loc, index) => (
+  <>
+    <Marker
+      key={`alag-${index}`}
+      coordinate={{ latitude: loc.lat, longitude: loc.lng }}
+      title={loc.nome}
+      description="Área com histórico de alagamento"
+      opacity={0}
+    />
+    <Circle
+      key={`circulo-${index}`}
+      center={{ latitude: loc.lat, longitude: loc.lng }}
+      radius={raio}
+      strokeWidth={2}
+      strokeColor="rgba(0, 174, 255, 0.6)"
+      fillColor="rgba(4, 0, 255, 0.57)"
+    />
+  </>
+))}
       </MapView>
 
       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>

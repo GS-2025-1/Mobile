@@ -2,9 +2,18 @@ import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Alert
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
-import { getEnderecos, deleteEndereco, Endereco } from '@/services/enderecos';
+
+type Endereco = {
+  id: number;
+  nomeRua: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  cep: string;
+};
 
 export default function EnderecosCadastrados() {
   const [enderecos, setEnderecos] = useState<Endereco[]>([]);
@@ -14,11 +23,13 @@ export default function EnderecosCadastrados() {
 
   const carregarEnderecos = async () => {
     try {
-      const dados = await getEnderecos();
-      setEnderecos(dados);
+      const dados = await AsyncStorage.getItem('enderecos');
+      if (dados) {
+        const enderecosParse: Endereco[] = JSON.parse(dados);
+        setEnderecos(enderecosParse);
+      }
     } catch (error) {
-      console.error('Erro ao carregar enderecos:', error);
-      Alert.alert('Erro', 'Não foi possível carregar os endereços.');
+      console.error('Erro ao carregar endereços:', error);
     } finally {
       setCarregando(false);
     }
@@ -38,11 +49,11 @@ export default function EnderecosCadastrados() {
         style: 'destructive',
         onPress: async () => {
           try {
-            await deleteEndereco(id);
-            carregarEnderecos();
+            const novaLista = enderecos.filter((e) => e.id !== id);
+            setEnderecos(novaLista);
+            await AsyncStorage.setItem('enderecos', JSON.stringify(novaLista));
           } catch (error) {
             console.error('Erro ao excluir endereço:', error);
-            Alert.alert('Erro', 'Falha ao excluir o endereço.');
           }
         }
       }
@@ -61,11 +72,18 @@ export default function EnderecosCadastrados() {
   };
 
   const novoEndereco = () => {
+    router.push('/(tabs)/cadastro');
+  };
+
+  const verNoMapa = (endereco: Endereco) => {
     router.push({
-      pathname: '/(tabs)/cadastro',
+      pathname: '/mapa',
       params: {
-        editando: 'false',
-      },
+        nome_rua: endereco.nomeRua,
+        bairro: endereco.bairro,
+        cidade: endereco.cidade,
+        estado: endereco.estado
+      }
     });
   };
 
@@ -92,44 +110,34 @@ export default function EnderecosCadastrados() {
         ) : (
           enderecos.map((endereco) => (
             <View key={endereco.id} style={styles.card}>
-          <Text style={styles.cardText}><Text style={styles.label}>Rua:</Text> {endereco.nome_rua}</Text>
-          <Text style={styles.cardText}><Text style={styles.label}>Bairro:</Text> {endereco.bairro}</Text>
-          <Text style={styles.cardText}><Text style={styles.label}>Cidade:</Text> {endereco.cidade}</Text>
-          <Text style={styles.cardText}><Text style={styles.label}>Estado:</Text> {endereco.estado}</Text>
+              <Text style={styles.cardText}><Text style={styles.label}>Rua:</Text> {endereco.nomeRua}</Text>
+              <Text style={styles.cardText}><Text style={styles.label}>Bairro:</Text> {endereco.bairro}</Text>
+              <Text style={styles.cardText}><Text style={styles.label}>Cidade:</Text> {endereco.cidade}</Text>
+              <Text style={styles.cardText}><Text style={styles.label}>Estado:</Text> {endereco.estado}</Text>
+              <Text style={styles.cardText}><Text style={styles.label}>CEP:</Text> {endereco.cep}</Text>
 
-          <View style={styles.botoes}>
-            <TouchableOpacity
-              style={styles.botaoEditar}
-              onPress={() => editarEndereco(endereco)}
-            >
-              <Text style={styles.textoBotao}>Editar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.botaoExcluir}
-              onPress={() => excluirEndereco(endereco.id!)}
-            >
-              <Text style={styles.textoBotao}>Excluir</Text>
-            </TouchableOpacity>
-          </View>
+              <View style={styles.botoes}>
+                <TouchableOpacity
+                  style={styles.botaoEditar}
+                  onPress={() => editarEndereco(endereco)}
+                >
+                  <Text style={styles.textoBotao}>Editar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.botaoExcluir}
+                  onPress={() => excluirEndereco(endereco.id)}
+                >
+                  <Text style={styles.textoBotao}>Excluir</Text>
+                </TouchableOpacity>
+              </View>
 
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#2196F3',
-              padding: 8,
-              borderRadius: 6,
-              marginTop: 8,
-            }}
-            onPress={() =>
-              router.push({
-                pathname: '/mapa',
-                params: {
-                  nome_rua: endereco.nome_rua, bairro: endereco.bairro, cidade: endereco.cidade, estado: endereco.estado,
-                },
-              })
-            }>
-            <Text style={{ color: '#fff', textAlign: 'center' }}>Ver no mapa</Text>
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity
+                style={styles.botaoMapa}
+                onPress={() => verNoMapa(endereco)}
+              >
+                <Text style={styles.textoBotao}>Ver no mapa</Text>
+              </TouchableOpacity>
+            </View>
           ))
         )}
       </ScrollView>
@@ -154,13 +162,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 40,
   },
-  botaoNovo: {
-    backgroundColor: '#28a745',
-    padding: 12,
-    borderRadius: 6,
-    marginBottom: 20,
-    alignItems: 'center',
-  },
   card: {
     backgroundColor: '#ffffffcc',
     borderRadius: 10,
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
   },
   cardText: {
     fontSize: 16,
-    marginBottom: 4,
+    marginBottom: 4
   },
   label: {
     fontWeight: 'bold',
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
   botoes: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: 10
   },
   botaoEditar: {
     backgroundColor: '#007bff',
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     flex: 1,
     marginRight: 5,
-    alignItems: 'center',
+    alignItems: 'center'
   },
   botaoExcluir: {
     backgroundColor: '#dc3545',
@@ -195,17 +196,31 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     flex: 1,
     marginLeft: 5,
-    alignItems: 'center',
+    alignItems: 'center'
+  },
+  botaoNovo: {
+    backgroundColor: '#28a745',
+    padding: 12,
+    borderRadius: 6,
+    marginBottom: 20,
+    alignItems: 'center'
+  },
+  botaoMapa: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 6,
+    marginTop: 8,
+    alignItems: 'center'
   },
   textoBotao: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   naoEncontrado: {
     color: '#fff',
     textAlign: 'center',
     fontSize: 16,
-    marginTop: 40,
+    marginTop: 40
   },
   loadingContainer: {
     flex: 1,
