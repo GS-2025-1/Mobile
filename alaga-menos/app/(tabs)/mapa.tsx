@@ -4,7 +4,7 @@ import MapView, { Marker, Circle } from 'react-native-maps';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyD8Zv-YC0LgO1RcikKzybw7ihKKW9-Hj5g';
+const GOOGLE_MAPS_API_KEY = '';
 
 const mapDarkStyle = [
   { elementType: 'geometry', stylers: [{ color: '#1d2c4d' }] },
